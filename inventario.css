@@ -1,0 +1,36 @@
+
+/* #&#&# Estilos complementarios del inventario */
+
+#vista-inventario .campo select {
+    width: 100%;
+    min-height: 43px;
+    padding: 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #253246;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+#vista-inventario .campo select:focus-visible {
+    outline: 3px solid #478dbb;
+    outline-offset: 2px;
+}
+
+#vista-inventario .panel-separado {
+    margin-top: 24px;
+}
+
+#vista-inventario .tabla-productos {
+    min-width: 680px;
+}
+
+#vista-inventario .tabla-productos th,
+#vista-inventario .tabla-productos td {
+    vertical-align: middle;
+}
+
+#vista-inventario .aviso-formulario {
+    line-height: 1.7;
+}

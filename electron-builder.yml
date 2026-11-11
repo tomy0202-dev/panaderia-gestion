@@ -1,0 +1,30 @@
+
+appId: com.panaderia.gestion
+
+productName: Panaderia Gestion
+
+directories:
+  output: dist
+
+asar: true
+
+files:
+  - "**/*"
+  - "!**/.env"
+  - "!**/dist/**"
+  - "!**/backups/**"
+  - "!**/respaldos/**"
+  - "!**/*.zip"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Panaderia Gestion

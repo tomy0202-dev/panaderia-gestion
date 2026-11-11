@@ -1,0 +1,136 @@
+
+/* #&#&# ADMINISTRACIÓN DE USUARIOS */
+
+#vista-usuarios .panel-usuarios {
+    margin-top: 0;
+}
+
+/* #&#&# Formularios */
+
+#vista-usuarios .campo select {
+    width: 100%;
+    min-height: 43px;
+    padding: 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: white;
+    color: #253246;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+#vista-usuarios .campo select:focus-visible {
+    outline: 3px solid #478dbb;
+    outline-offset: 2px;
+}
+
+/* #&#&# Buscador y filtros */
+
+.usuarios-filtros {
+    display: grid;
+    grid-template-columns:
+        minmax(180px, 2fr)
+        minmax(140px, 1fr)
+        minmax(140px, 1fr);
+
+    gap: 15px;
+    align-items: end;
+
+    margin-bottom: 22px;
+    padding: 18px;
+
+    border: 1px solid #e5e9ef;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.usuarios-filtros .campo-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.usuarios-filtros label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #253246;
+}
+
+.usuarios-filtros input,
+.usuarios-filtros select {
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 13px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #253246;
+
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.usuarios-filtros input:focus-visible,
+.usuarios-filtros select:focus-visible {
+    outline: 3px solid #478dbb;
+    outline-offset: 2px;
+}
+
+/* #&#&# Tabla de usuarios */
+
+#vista-usuarios .tabla-contenedor {
+    overflow-x: auto;
+}
+
+#vista-usuarios .tabla-productos {
+    min-width: 540px;
+}
+
+#vista-usuarios .tabla-productos th,
+#vista-usuarios .tabla-productos td {
+    padding: 14px 12px;
+}
+
+#vista-usuarios .tabla-productos tbody tr:hover {
+    background: #edf4fb;
+}
+
+/* #&#&# Mensajes */
+
+#vista-usuarios .mensaje-estado {
+    min-height: 19px;
+    line-height: 1.6;
+}
+
+/* #&#&# Pantallas pequeñas */
+
+@media (max-width: 950px) {
+
+    .usuarios-filtros {
+        grid-template-columns: repeat(
+            2, minmax(0, 1fr)
+        );
+    }
+
+    .usuarios-filtros .campo-filtro:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 650px) {
+
+    .usuarios-filtros {
+        grid-template-columns: 1fr;
+        padding: 14px;
+    }
+
+    .usuarios-filtros .campo-filtro:first-child {
+        grid-column: auto;
+    }
+
+    #vista-usuarios .formulario-grid {
+        grid-template-columns: 1fr;
+    }
+}

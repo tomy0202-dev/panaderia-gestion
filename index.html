@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <title>Sistema de Gestión de Panadería</title>
+    
+    <link rel="stylesheet" href="styles.css">
+    <script src="renderer.js" defer></script>
+    <script src="inventario.js" defer></script>
+    <script src="productos-editar.js" defer></script>
+    <script src="usuarios.js" defer></script>
+    <script src="ventas.js" defer></script>
+    <script src="alertas.js" defer></script>
+    <script src="perdidas.js" defer></script>
+    <script src="reportes.js" defer></script>
+    <script src="ventas-historial.js" defer></script>
+    <script src="respaldos.js" defer></script>
+    <script src="submenus.js" defer></script>
+    <script src="acceso.js" defer></script>
+</head>
+<body>
+
+<section id="pantalla-acceso" class="pantalla-acceso">
+    <form id="formulario-acceso" class="tarjeta-acceso">
+        <div class="acceso-marca">🍞</div>
+        <h1>Sistema de Gestión de Panadería</h1>
+        <p>Ingresa con tu cuenta de administrador o cajero.</p>
+        <label for="acceso-usuario">Usuario</label>
+        <input id="acceso-usuario" type="text" maxlength="50" autocomplete="username" required autofocus>
+        <label for="acceso-contrasena">Contraseña</label>
+        <input id="acceso-contrasena" type="password" autocomplete="current-password" required>
+        <button id="boton-iniciar-sesion" type="submit" class="boton-primario">Iniciar sesión</button>
+        <p id="mensaje-acceso" class="mensaje" role="status" aria-live="polite"></p>
+    </form>
+</section>
+
+<div class="aplicacion">
+    <aside class="barra-lateral">
+        <div class="marca"><span class="marca-icono">🍞</span><div><strong>Panadería</strong><small>Sistema de gestión</small></div></div>
+        <p class="menu-etiqueta">MENÚ PRINCIPAL</p>
+        <nav id="navegacion" class="navegacion" aria-label="Navegación principal">
+            <button type="button" class="menu-boton" data-modulo="inicio">Inicio</button>
+            <button type="button" class="menu-boton" data-modulo="productos">Productos</button>
+            <button type="button" class="menu-boton" data-modulo="inventario">Inventario</button>
+            <button type="button" class="menu-boton" data-modulo="ventas">Ventas</button>
+            <button type="button" class="menu-boton" data-modulo="usuarios">Usuarios</button>
+            <button type="button" class="menu-boton" data-modulo="alertas">Alertas</button>
+            <button type="button" class="menu-boton" data-modulo="perdidas">Pérdidas</button>
+            <button type="button" class="menu-boton" data-modulo="reportes">Reportes</button>
+            <button type="button" class="menu-boton" data-modulo="respaldos">Respaldos</button>
+        </nav>
+    </aside>
+
+    <main id="contenido-principal" class="contenido">
+        <header class="encabezado">
+            <div><p class="subtitulo">SISTEMA DE GESTIÓN DE PANADERÍA</p><h1 id="titulo-pagina">Inicio</h1><p id="descripcion-pagina">Bienvenido al sistema.</p></div>
+            <div id="barra-sesion" class="barra-sesion" hidden><div><strong id="sesion-nombre"></strong><small id="sesion-rol"></small></div><button type="button" id="boton-cerrar-sesion" class="boton-secundario">Cerrar sesión</button></div>
+        </header>
+
+        <section id="vista-inicio" class="pantalla">
+            <div class="bienvenida"><h2>Sistema de Gestión de Panadería</h2><p>Consulta los productos, administra el inventario y revisa las operaciones desde el menú principal.</p></div>
+            <div class="tarjetas-inicio" id="accesos-admin"><button type="button" class="tarjeta-acceso-directo" data-acceso="productos">Productos: registrar, consultar y modificar</button><button type="button" class="tarjeta-acceso-directo" data-acceso="inventario">Inventario: lotes y entradas</button></div>
+            <div id="alertas-resumen-inicio" class="resumen-alerta-panel" hidden>
+                <div>
+                    <strong>Resumen de alertas</strong>
+                    <p id="resumen-alertas-inicio">Consultando el inventario...</p>
+                </div>
+                <button type="button" class="boton-secundario" data-abrir-alertas>Ver alertas</button>
+            </div>
+        </section>
+
+        <section id="vista-productos" class="pantalla" hidden>
+            <div class="panel" data-subvista="consultar" hidden>
+                <div class="panel-encabezado"><div><h2>Consultar productos</h2><p>Existencias y estado en orden alfabético.</p></div><button id="btn-listar-productos" type="button" class="boton-primario">Actualizar productos</button></div>
+                <div class="barra-filtros"><div class="campo"><label for="buscar-nombre-producto">Buscar por nombre</label><input id="buscar-nombre-producto" type="search" placeholder="Ej. pan, gaseosa..." autocomplete="off"></div></div>
+                <p id="estado-productos" class="mensaje" role="status" aria-live="polite">Abre la consulta para cargar productos.</p>
+                <p id="contador-productos" class="contador"></p>
+                <div class="tabla-contenedor"><table class="tabla-productos"><thead><tr><th>Código</th><th>Producto</th><th>Precio</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="cuerpo-tabla-productos"></tbody></table></div>
+            </div>
+            <div class="panel" data-subvista="registrar" hidden>
+                <h2>Registrar producto</h2><p class="descripcion-panel">El stock inicial será 0 hasta registrar un lote en Inventario.</p>
+                <form id="form-registrar-producto">
+                    <div class="formulario-grid">
+                        <div class="campo"><label for="codigo-producto">Código *</label><input id="codigo-producto" type="text" maxlength="50" placeholder="PAN-002" required></div>
+                        <div class="campo"><label for="nombre-producto">Nombre *</label><input id="nombre-producto" type="text" minlength="2" maxlength="150" required></div>
+                        <div class="campo"><label for="costo-producto">Costo de referencia (COP) *</label><input id="costo-producto" type="number" min="0" step="0.01" required></div>
+                        <div class="campo"><label for="precio-producto">Precio de venta (COP) *</label><input id="precio-producto" type="number" min="0" step="0.01" required></div>
+                        <div class="campo"><label for="minimo-producto">Stock mínimo *</label><input id="minimo-producto" type="number" min="0" max="2147483647" step="1" value="0" required></div>
+                    </div>
+                    <div class="acciones"><button id="btn-guardar-producto" type="submit" class="boton-primario">Guardar producto</button><button type="reset" class="boton-secundario">Limpiar</button></div>
+                    <p id="mensaje-registro-producto" class="mensaje" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+            <div class="panel" data-subvista="modificar" hidden>
+                <h2>Modificar producto</h2><p class="descripcion-panel">El estado Activo permite ventas y nuevas entradas. Inactivo conserva el historial y las existencias, pero impide nuevas operaciones comerciales.</p>
+                <form id="form-modificar-producto">
+                    <div class="formulario-grid">
+                        <div class="campo"><label for="editar-codigo">Producto *</label><select id="editar-codigo" required><option value="">Selecciona un producto</option></select><small>El código no se modifica.</small></div>
+                        <div class="campo"><label for="editar-nombre">Nombre *</label><input id="editar-nombre" type="text" minlength="2" maxlength="150" required></div>
+                        <div class="campo"><label for="editar-costo">Costo de referencia (COP) *</label><input id="editar-costo" type="number" min="0" step="0.01" required></div>
+                        <div class="campo"><label for="editar-precio">Precio de venta (COP) *</label><input id="editar-precio" type="number" min="0" step="0.01" required></div>
+                        <div class="campo"><label for="editar-minimo">Stock mínimo *</label><input id="editar-minimo" type="number" min="0" max="2147483647" step="1" required></div>
+                        <div class="campo"><label>Estado del producto</label><label class="casilla-estado" for="editar-activo"><input id="editar-activo" type="checkbox"> Activo</label><small>Desmarcar inhabilita el producto sin borrarlo.</small></div>
+                    </div>
+                    <div class="acciones"><button id="btn-actualizar-producto" type="submit" class="boton-primario" disabled>Guardar cambios</button></div>
+                    <p id="mensaje-editar-producto" class="mensaje" role="status" aria-live="polite">Selecciona un producto.</p>
+                </form>
+            </div>
+        </section>
+
+        <section id="vista-inventario" class="pantalla" hidden>
+            <div id="alertas-resumen-inventario" class="resumen-alerta-panel" hidden>
+                <div><strong>Advertencias de inventario</strong>
+                <p id="resumen-alertas-inventario">Consultando el inventario...</p></div>
+                <button type="button" class="boton-secundario" data-abrir-alertas>Ver alertas</button>
+            </div>
+            <div class="panel" data-subvista="lotes" hidden>
+                <div class="panel-encabezado"><div><h2>Consultar lotes</h2><p>Existencias, costos y fechas de vencimiento por lote.</p></div><button id="btn-listar-lotes" type="button" class="boton-primario">Actualizar lotes</button></div>
+                <div class="barra-filtros"><div class="campo"><label for="buscar-nombre-lote">Buscar producto por nombre</label><input id="buscar-nombre-lote" type="search" placeholder="Ej. pan..." autocomplete="off"></div><div class="campo"><label for="ordenar-lotes">Ordenar lotes</label><select id="ordenar-lotes"><option value="nombre-asc">Nombre A–Z</option><option value="nombre-desc">Nombre Z–A</option><option value="fecha-asc">Vencimiento próximo primero</option><option value="fecha-desc">Vencimiento lejano primero</option></select></div></div>
+                <p id="estado-lotes" class="mensaje" role="status" aria-live="polite"></p><p id="contador-lotes" class="contador"></p>
+                <div class="tabla-contenedor"><table class="tabla-productos"><thead><tr><th>Lote</th><th>Código</th><th>Producto</th><th>Unidades</th><th>Vencimiento</th><th>Costo unitario</th></tr></thead><tbody id="cuerpo-tabla-lotes"></tbody></table></div>
+            </div>
+            <div class="panel" data-subvista="entrada" hidden>
+                <h2>Registrar entrada de mercancía</h2><p class="descripcion-panel">Cada ingreso genera un lote y un movimiento asociados al administrador autenticado.</p>
+                <form id="form-ingreso-lote">
+                    <div class="formulario-grid">
+                        <div class="campo"><label for="entrada-codigo">Producto activo *</label><select id="entrada-codigo" required><option value="">Selecciona un producto</option></select></div>
+                        <div class="campo"><label for="entrada-cantidad">Cantidad *</label><input id="entrada-cantidad" type="number" min="1" max="2147483647" step="1" required></div>
+                        <div class="campo"><label for="entrada-fecha">Fecha de vencimiento *</label><input id="entrada-fecha" type="date" required></div>
+                        <div class="campo"><label for="entrada-costo">Costo unitario (COP) *</label><input id="entrada-costo" type="number" min="0" step="0.01" required></div>
+                    </div>
+                    <div class="acciones"><button id="btn-registrar-entrada" type="submit" class="boton-primario">Registrar entrada</button><button type="reset" class="boton-secundario">Limpiar</button></div>
+                    <p id="mensaje-entrada" class="mensaje" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+        </section>
+
+        <section id="vista-usuarios" class="pantalla" hidden>
+            <div class="panel" data-subvista="consultar" hidden>
+                <div class="panel-encabezado"><div><h2>Consultar usuarios</h2><p>Las cuentas y sus permisos.</p></div><button id="btn-actualizar-usuarios" type="button" class="boton-primario">Actualizar usuarios</button></div>
+                <div class="barra-filtros"><div class="campo"><label for="buscar-usuario">Buscar por nombre</label><input id="buscar-usuario" type="search"></div><div class="campo"><label for="filtrar-rol-usuario">Perfil</label><select id="filtrar-rol-usuario"><option value="todos">Todos</option><option value="administrador">Administrador</option><option value="cajero">Cajero</option></select></div><div class="campo"><label for="filtrar-estado-usuario">Estado</label><select id="filtrar-estado-usuario"><option value="todos">Todos</option><option value="activos">Activos</option><option value="inactivos">Inactivos</option></select></div></div>
+                <p id="mensaje-lista-usuarios" class="mensaje" role="status" aria-live="polite"></p>
+                <div class="tabla-contenedor"><table class="tabla-productos"><thead><tr><th>Usuario</th><th>Perfil</th><th>Estado</th><th>Creado</th></tr></thead><tbody id="tabla-usuarios"></tbody></table></div>
+            </div>
+            <div class="panel" data-subvista="registrar" hidden>
+                <h2>Registrar usuario</h2><p class="descripcion-panel">Crea una cuenta individual solo cuando sea necesaria.</p>
+                <form id="form-registrar-usuario"><div class="formulario-grid">
+                    <div class="campo"><label for="nuevo-nombre-usuario">Nombre de usuario *</label><input id="nuevo-nombre-usuario" type="text" minlength="4" maxlength="30" autocomplete="off" required></div>
+                    <div class="campo"><label for="nuevo-rol-usuario">Rol *</label><select id="nuevo-rol-usuario"><option value="cajero">Cajero</option><option value="administrador">Administrador</option></select></div>
+                    <div class="campo"><label for="nueva-clave-usuario">Contraseña *</label><input id="nueva-clave-usuario" type="password" minlength="12" autocomplete="new-password" required></div>
+                    <div class="campo"><label for="repetir-clave-usuario">Repetir contraseña *</label><input id="repetir-clave-usuario" type="password" minlength="12" autocomplete="new-password" required></div>
+                </div><div class="acciones"><button id="btn-guardar-usuario" class="boton-primario" type="submit">Guardar usuario</button></div><p id="mensaje-registro-usuario" class="mensaje" role="status" aria-live="polite"></p></form>
+            </div>
+            <div class="panel" data-subvista="estado" hidden>
+                <h2>Activar o desactivar usuarios</h2><p class="descripcion-panel">Una cuenta inactiva no puede iniciar sesión. No puedes desactivar tu cuenta.</p>
+                <form id="form-estado-usuario"><div class="formulario-grid">
+                    <div class="campo"><label for="usuario-estado-id">Cuenta *</label><select id="usuario-estado-id" required><option value="">Selecciona un usuario</option></select></div>
+                    <div class="campo"><label for="usuario-nuevo-estado">Nuevo estado *</label><select id="usuario-nuevo-estado"><option value="0">Inactivo</option><option value="1">Activo</option></select></div>
+                </div><p id="usuario-estado-actual" class="contador"></p><div class="acciones"><button id="btn-cambiar-estado" type="submit" class="boton-primario">Aplicar cambio</button></div><p id="mensaje-estado-usuario" class="mensaje" role="status" aria-live="polite"></p></form>
+            </div>
+            <div class="panel" data-subvista="clave" hidden>
+                <h2>Restablecer contraseña</h2><p class="descripcion-panel">No se necesita conocer la contraseña anterior, pero esta operación requiere un administrador.</p>
+                <form id="form-restablecer-clave"><div class="formulario-grid">
+                    <div class="campo"><label for="usuario-clave-id">Cuenta *</label><select id="usuario-clave-id" required><option value="">Selecciona un usuario</option></select></div>
+                    <div class="campo"><label for="usuario-clave-nueva">Nueva contraseña *</label><input id="usuario-clave-nueva" type="password" minlength="12" autocomplete="new-password" required></div>
+                    <div class="campo"><label for="usuario-clave-repetir">Repetir contraseña *</label><input id="usuario-clave-repetir" type="password" minlength="12" autocomplete="new-password" required></div>
+                </div><div class="acciones"><button id="btn-restablecer-clave" type="submit" class="boton-primario">Guardar nueva contraseña</button></div><p id="mensaje-clave-usuario" class="mensaje" role="status" aria-live="polite"></p></form>
+            </div>
+        </section>
+
+        <section id="vista-ventas" class="pantalla" hidden>
+            <div class="panel" data-subvista="registrar" hidden>
+                <div class="panel-encabezado">
+                    <div>
+                        <h2>Registrar venta</h2>
+                        <p>Busca productos por nombre, indica una cantidad y pulsa + para agregarlos.</p>
+                    </div>
+                    <button id="btn-actualizar-catalogo-ventas" type="button" class="boton-secundario">Actualizar productos</button>
+                </div>
+                <div class="barra-filtros buscador-catalogo-venta">
+                    <div class="campo">
+                        <label for="buscar-producto-venta">Buscar producto por nombre</label>
+                        <input id="buscar-producto-venta" type="search" autocomplete="off"
+                               placeholder="Ej. pan, gaseosa...">
+                    </div>
+                </div>
+                <p id="mensaje-venta" class="mensaje" role="status" aria-live="polite"></p>
+                <p id="contador-catalogo-ventas" class="contador"></p>
+                <div class="tabla-contenedor">
+                    <table class="tabla-productos tabla-catalogo-ventas">
+                        <thead><tr>
+                            <th>Producto</th><th>Código</th><th>Precio</th><th>Stock</th>
+                            <th>Estado</th><th>Cantidad</th><th>Agregar</th>
+                        </tr></thead>
+                        <tbody id="cuerpo-catalogo-ventas"></tbody>
+                    </table>
+                </div>
+                <div class="barra-abrir-carrito">
+                    <button id="btn-abrir-carrito" type="button" class="boton-primario" disabled>
+                        Carrito (0 productos · 0 unidades)
+                    </button>
+                    <strong id="venta-total-carrito-boton">$0</strong>
+                </div>
+                <div id="resultado-venta" class="resultado-venta" hidden></div>
+
+                <dialog id="dialogo-carrito-ventas" class="dialogo-carrito"
+                        aria-labelledby="titulo-carrito-ventas" aria-modal="true">
+                    <div class="panel-encabezado">
+                        <div>
+                            <h2 id="titulo-carrito-ventas">Carrito de venta</h2>
+                            <p>Revisa cantidades y confirma todos los productos en una sola operación.</p>
+                        </div>
+                        <button id="btn-cerrar-carrito" type="button" class="boton-secundario">Cerrar</button>
+                    </div>
+                    <div class="tabla-contenedor">
+                        <table class="tabla-productos">
+                            <thead><tr>
+                                <th>Producto</th><th>Código</th><th>Precio</th><th>Stock</th>
+                                <th>Cantidad</th><th>Subtotal</th><th>Acción</th>
+                            </tr></thead>
+                            <tbody id="cuerpo-carrito-ventas"></tbody>
+                        </table>
+                    </div>
+                    <div class="carrito-pie">
+                        <span>Unidades: <strong id="carrito-unidades-venta">0</strong></span>
+                        <span>Total estimado: <strong id="carrito-total-venta">$0</strong></span>
+                    </div>
+                    <p id="mensaje-carrito-ventas" class="mensaje" role="status" aria-live="polite"></p>
+                    <div class="acciones">
+                        <button id="btn-finalizar-carrito" type="button" class="boton-primario" disabled>
+                            Finalizar transacción
+                        </button>
+                    </div>
+                    <p class="nota-historica">El importe y el inventario se validarán nuevamente al confirmar.
+                        El sistema advierte si los lotes FEFO seleccionados están vencidos.</p>
+                </dialog>
+            </div>
+
+            <div class="panel" data-subvista="consultar" hidden>
+                <div class="panel-encabezado">
+                    <div>
+                        <h2>Consultar ventas</h2>
+                        <p>Historial de operaciones, responsable, fecha, productos e importes.</p>
+                    </div>
+                    <button id="btn-actualizar-historial" type="button" class="boton-secundario">Actualizar historial</button>
+                </div>
+
+                <form id="form-filtros-ventas" class="barra-filtros" autocomplete="off">
+                    <div class="campo">
+                        <label for="historial-numero">N.º de venta</label>
+                        <input id="historial-numero" type="number" min="1" step="1" placeholder="Ej. 5">
+                    </div>
+                    <div class="campo">
+                        <label for="historial-cajero">Nombre del cajero / usuario</label>
+                        <input id="historial-cajero" type="search" maxlength="50" placeholder="Ej. cajero_principal">
+                    </div>
+                    <div class="campo">
+                        <label for="historial-desde">Desde</label>
+                        <input id="historial-desde" type="date">
+                    </div>
+                    <div class="campo">
+                        <label for="historial-hasta">Hasta</label>
+                        <input id="historial-hasta" type="date">
+                    </div>
+                    <div class="acciones historial-acciones">
+                        <button type="submit" class="boton-primario">Buscar</button>
+                        <button id="btn-limpiar-historial" type="button" class="boton-secundario">Limpiar filtros</button>
+                    </div>
+                </form>
+
+                <p id="mensaje-historial-ventas" class="mensaje" role="status" aria-live="polite"></p>
+                <div class="historial-indicadores" id="indicadores-historial" hidden>
+                    <div><small>Ventas encontradas</small><strong id="historial-total-ventas">0</strong></div>
+                    <div><small>Importe de las ventas encontradas</small><strong id="historial-total-importe">$0</strong></div>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <table class="tabla-productos">
+                        <thead><tr>
+                            <th>N.º venta</th><th>Fecha y hora</th><th>Usuario responsable</th>
+                            <th>Producto(s)</th><th>Unidades</th><th>Total</th><th>Acción</th>
+                        </tr></thead>
+                        <tbody id="cuerpo-historial-ventas"></tbody>
+                    </table>
+                </div>
+
+                <div class="paginacion-ventas" id="paginacion-historial" hidden>
+                    <button type="button" id="historial-anterior" class="boton-secundario">Anterior</button>
+                    <span id="historial-pagina">Página 1</span>
+                    <button type="button" id="historial-siguiente" class="boton-secundario">Siguiente</button>
+                </div>
+
+                <dialog id="detalle-historial-venta" class="detalle-historial"
+                        aria-labelledby="detalle-titulo-venta" aria-modal="true">
+                    <div class="panel-encabezado">
+                        <h3 id="detalle-titulo-venta">Detalle de venta</h3>
+                        <button type="button" id="cerrar-detalle-venta" class="boton-secundario">Cerrar detalle</button>
+                    </div>
+                    <p id="detalle-resumen-venta" class="descripcion-panel"></p>
+                    <p id="detalle-mensaje-venta" class="mensaje" role="status" aria-live="polite"></p>
+                    <div class="tabla-contenedor">
+                        <table class="tabla-productos">
+                            <thead><tr>
+                                <th>Código</th><th>Producto (nombre actual)</th><th>Lote</th>
+                                <th>Vencimiento</th><th>Cantidad</th><th>Precio unitario</th>
+                                <th>Costo unitario</th><th>Subtotal</th>
+                            </tr></thead>
+                            <tbody id="cuerpo-detalle-venta"></tbody>
+                        </table>
+                    </div>
+                    <p class="nota-historica">Los precios y costos mostrados corresponden al momento de la venta.
+                        El nombre del producto es el actual, ya que la base de datos no conserva su nombre anterior.</p>
+                </dialog>
+            </div>
+        </section>
+        
+        <section id="vista-alertas" class="pantalla" hidden>
+            <div class="panel">
+                <div class="panel-encabezado">
+                    <div><h2>Alertas de inventario</h2>
+                    <p>Stock mínimo, lotes que vencen en los próximos tres días y lotes vencidos.</p></div>
+                    <button id="btn-actualizar-alertas" type="button" class="boton-primario">Actualizar alertas</button>
+                </div>
+                <p class="aviso-informativo-alertas">Las alertas son informativas. No se eliminan productos ni se descuentan unidades automáticamente.
+                Los lotes inactivos con existencias también se advierten por vencimiento.</p>
+                <p id="mensaje-alertas" class="mensaje" role="status" aria-live="polite"></p>
+                <div class="grupo-alerta-lista">
+                    <div class="alerta-subtitulo"><h3>Stock mínimo</h3><span id="contador-alerta-stock"></span></div>
+                    <div class="tabla-contenedor"><table class="tabla-productos"><thead><tr>
+                        <th>Código</th><th>Producto</th><th>Stock actual</th><th>Stock mínimo</th>
+                    </tr></thead><tbody id="tabla-alertas-stock"></tbody></table></div>
+                </div>
+                <div class="grupo-alerta-lista">
+                    <div class="alerta-subtitulo"><h3>Próximos a vencer (hoy a 3 días)</h3><span id="contador-alerta-proximos"></span></div>
+                    <div class="tabla-contenedor"><table class="tabla-productos"><thead><tr>
+                        <th>Lote</th><th>Producto</th><th>Código</th><th>Existencias</th>
+                        <th>Vencimiento</th><th>Plazo</th><th>Estado</th>
+                    </tr></thead><tbody id="tabla-alertas-proximos"></tbody></table></div>
+                </div>
+                <div class="grupo-alerta-lista">
+                    <div class="alerta-subtitulo"><h3>Vencidos con existencias</h3><span id="contador-alerta-vencidos"></span></div>
+                    <div class="tabla-contenedor"><table class="tabla-productos"><thead><tr>
+                        <th>Lote</th><th>Producto</th><th>Código</th><th>Existencias</th>
+                        <th>Vencimiento</th><th>Retraso</th><th>Estado</th>
+                    </tr></thead><tbody id="tabla-alertas-vencidos"></tbody></table></div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="vista-perdidas" class="pantalla" hidden>
+            <div class="panel" data-subvista="registrar" hidden>
+                <div class="panel-encabezado"><div>
+                    <h2>Registrar pérdida por vencimiento</h2>
+                    <p>Retira manualmente unidades de un lote vencido sin eliminar el producto ni su historial.</p>
+                </div><button id="btn-recargar-lotes-vencidos" type="button" class="boton-secundario">Actualizar lotes</button></div>
+                <p class="aviso-informativo-alertas">Solo se permiten pérdidas de lotes cuya fecha sea anterior a hoy. Los lotes que vencen hoy aún no se consideran vencidos.</p>
+                <form id="form-registrar-perdida" autocomplete="off">
+                    <div class="formulario-grid">
+                        <div class="campo">
+                            <label for="buscar-lote-perdida">Buscar producto por nombre o código</label>
+                            <input id="buscar-lote-perdida" type="search" placeholder="Ej. pan, PAN-001..." autocomplete="off">
+                        </div>
+                        <div class="campo">
+                            <label for="perdida-id-lote">Lote vencido *</label>
+                            <select id="perdida-id-lote" required><option value="">Selecciona un lote</option></select>
+                        </div>
+                        <div class="campo">
+                            <label for="perdida-cantidad">Unidades a retirar *</label>
+                            <input id="perdida-cantidad" type="number" min="1" max="2147483647" step="1" required>
+                        </div>
+                        <div class="campo">
+                            <label for="perdida-observacion">Observación (opcional)</label>
+                            <input id="perdida-observacion" type="text" maxlength="255" placeholder="Ej. Retiro por vencimiento de mercancía">
+                        </div>
+                    </div>
+                    <div class="resumen-retiro" id="resumen-lote-perdida" hidden>
+                        <strong id="perdida-descripcion-lote"></strong>
+                        <span>Unidades disponibles: <b id="perdida-disponibles">0</b></span>
+                        <span>Vencimiento: <b id="perdida-fecha-lote">—</b></span>
+                        <span>Costo unitario histórico: <b id="perdida-costo-lote">$0</b></span>
+                        <span>Valor estimado de la pérdida: <b id="perdida-valor-estimado">$0</b></span>
+                    </div>
+                    <p id="mensaje-registrar-perdida" class="mensaje" role="status" aria-live="polite"></p>
+                    <div class="acciones">
+                        <button id="btn-registrar-perdida" class="boton-primario" type="submit" disabled>Confirmar retiro de inventario</button>
+                        <button id="btn-limpiar-perdida" class="boton-secundario" type="button">Limpiar formulario</button>
+                    </div>
+                </form>
+            </div>
+            <div class="panel" data-subvista="consultar" hidden>
+                <div class="panel-encabezado"><div>
+                    <h2>Consultar pérdidas por vencimiento</h2>
+                    <p>Historial de retiros: administrador responsable, fecha, lote, cantidad y costo.</p>
+                </div><button type="button" id="btn-actualizar-perdidas" class="boton-secundario">Actualizar historial</button></div>
+                <form id="form-filtros-perdidas" class="barra-filtros" autocomplete="off">
+                    <div class="campo"><label for="perdidas-desde">Desde</label><input type="date" id="perdidas-desde"></div>
+                    <div class="campo"><label for="perdidas-hasta">Hasta</label><input type="date" id="perdidas-hasta"></div>
+                    <div class="acciones"><button type="submit" class="boton-primario">Buscar</button>
+                        <button type="button" id="btn-limpiar-filtros-perdidas" class="boton-secundario">Todas las fechas</button></div>
+                </form>
+                <p class="mensaje" id="mensaje-historial-perdidas" role="status" aria-live="polite"></p>
+                <div class="historial-indicadores" id="indicadores-perdidas" hidden>
+                    <div><small>Retiros encontrados</small><strong id="total-retiros-perdidas">0</strong></div>
+                    <div><small>Valor de pérdidas</small><strong id="total-valor-perdidas">$0</strong></div>
+                </div>
+                <div class="tabla-contenedor"><table class="tabla-productos">
+                    <thead><tr><th>N.º</th><th>Fecha y hora</th><th>Administrador</th><th>Producto</th>
+                        <th>Lote</th><th>Vencimiento</th><th>Unidades</th><th>Costo/unid.</th>
+                        <th>Valor pérdida</th><th>Observación</th></tr></thead>
+                    <tbody id="tabla-historial-perdidas"></tbody>
+                </table></div>
+                <div class="paginacion-ventas" id="paginacion-perdidas" hidden>
+                    <button type="button" id="perdidas-anterior" class="boton-secundario">Anterior</button>
+                    <span id="perdidas-pagina">Página 1</span>
+                    <button type="button" id="perdidas-siguiente" class="boton-secundario">Siguiente</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="vista-reportes" class="pantalla" hidden>
+            <div class="panel" data-subvista="resumen" hidden>
+                <div class="panel-encabezado"><div><h2>Resumen de ventas por período</h2>
+                    <p>Consulta ingresos, número de operaciones y ventas por día.</p></div></div>
+                <form class="barra-filtros reporte-filtros" data-reporte-form autocomplete="off">
+                    <div class="campo"><label for="reporte-resumen-desde">Desde</label><input id="reporte-resumen-desde" class="reporte-desde" type="date" required></div>
+                    <div class="campo"><label for="reporte-resumen-hasta">Hasta</label><input id="reporte-resumen-hasta" class="reporte-hasta" type="date" required></div>
+                    <div class="acciones"><button type="submit" class="boton-primario">Consultar período</button></div>
+                </form>
+                <p class="mensaje reporte-mensaje" role="status" aria-live="polite"></p>
+                <div class="reporte-indicadores">
+                    <div><small>Ventas registradas</small><strong id="reporte-numero-ventas">—</strong></div>
+                    <div><small>Ingresos de ventas</small><strong id="reporte-ingresos-ventas">—</strong></div>
+                    <div><small>Unidades vendidas</small><strong id="reporte-unidades-vendidas">—</strong></div>
+                    <div><small>Importe promedio por venta</small><strong id="reporte-promedio-venta">—</strong></div>
+                </div>
+                <h3 class="reporte-subtitulo">Ventas por día</h3>
+                <div class="tabla-contenedor"><table class="tabla-productos">
+                    <thead><tr><th>Fecha</th><th>N.º ventas</th><th>Ingresos</th></tr></thead>
+                    <tbody id="reporte-tabla-diaria"></tbody>
+                </table></div>
+            </div>
+            <div class="panel" data-subvista="productos" hidden>
+                <div class="panel-encabezado"><div><h2>Productos más vendidos</h2>
+                    <p>Clasificación por unidades comercializadas y valores históricos de venta.</p></div></div>
+                <form class="barra-filtros reporte-filtros" data-reporte-form autocomplete="off">
+                    <div class="campo"><label for="reporte-productos-desde">Desde</label><input id="reporte-productos-desde" class="reporte-desde" type="date" required></div>
+                    <div class="campo"><label for="reporte-productos-hasta">Hasta</label><input id="reporte-productos-hasta" class="reporte-hasta" type="date" required></div>
+                    <div class="acciones"><button type="submit" class="boton-primario">Consultar período</button></div>
+                </form>
+                <p class="mensaje reporte-mensaje" role="status" aria-live="polite"></p>
+                <p class="nota-historica">Se muestran hasta 100 productos, ordenados por unidades. El nombre es el actual, pero los importes usan precios históricos.</p>
+                <div class="tabla-contenedor"><table class="tabla-productos">
+                    <thead><tr><th>Posición</th><th>Código</th><th>Producto</th><th>Unidades</th>
+                        <th>Ventas que lo incluyen</th><th>Ingresos</th><th>Ganancia bruta estimada</th></tr></thead>
+                    <tbody id="reporte-tabla-productos"></tbody>
+                </table></div>
+            </div>
+            <div class="panel" data-subvista="ganancias" hidden>
+                <div class="panel-encabezado"><div><h2>Ganancia bruta estimada</h2>
+                    <p>Ingresos menos costo histórico de los artículos vendidos, sin gastos generales.</p></div></div>
+                <form class="barra-filtros reporte-filtros" data-reporte-form autocomplete="off">
+                    <div class="campo"><label for="reporte-ganancias-desde">Desde</label><input id="reporte-ganancias-desde" class="reporte-desde" type="date" required></div>
+                    <div class="campo"><label for="reporte-ganancias-hasta">Hasta</label><input id="reporte-ganancias-hasta" class="reporte-hasta" type="date" required></div>
+                    <div class="acciones"><button type="submit" class="boton-primario">Consultar período</button></div>
+                </form>
+                <p class="mensaje reporte-mensaje" role="status" aria-live="polite"></p>
+                <div class="reporte-indicadores">
+                    <div><small>Ingresos según detalles</small><strong id="reporte-ingreso-detalle">—</strong></div>
+                    <div><small>Costo de artículos vendidos</small><strong id="reporte-costo-vendido">—</strong></div>
+                    <div><small>Ganancia bruta estimada</small><strong id="reporte-ganancia-bruta">—</strong></div>
+                    <div><small>Valor de pérdidas por vencimiento</small><strong id="reporte-valor-perdidas">—</strong></div>
+                </div>
+                <p id="reporte-aviso-conciliacion" class="nota-historica"></p>
+                <p class="aviso-informativo-alertas">Las pérdidas por vencimiento se muestran por separado y NO se descuentan de la ganancia bruta. Esta cifra no representa la utilidad neta: no contempla salarios, arriendo, servicios ni otros gastos.</p>
+                <h3 class="reporte-subtitulo">Ganancia bruta por producto</h3>
+                <div class="tabla-contenedor"><table class="tabla-productos">
+                    <thead><tr><th>Código</th><th>Producto</th><th>Unidades</th><th>Ingresos</th><th>Costo vendido</th><th>Ganancia bruta</th></tr></thead>
+                    <tbody id="reporte-tabla-ganancias"></tbody>
+                </table></div>
+            </div>
+        </section>
+        <section id="vista-respaldos" class="pantalla" hidden>
+            
+            <div class="panel" data-subvista="gestionar" hidden>
+                <div class="panel-encabezado">
+                    <div><h2>Copias de seguridad</h2>
+                        <p>Respaldo manual y automático de la base de datos MySQL completa.</p></div>
+                    <button type="button" id="btn-actualizar-respaldos" class="boton-secundario">Actualizar lista</button>
+                </div>
+                <div class="aviso-informativo-alertas">
+                    El sistema revisa los respaldos al iniciar y mientras permanece abierto. Si han transcurrido
+                    24 horas desde la última copia, genera una automática. Conserva las 3 copias normales más recientes.
+                    Se guarda una copia adicional de emergencia antes de restaurar.
+                </div>
+                <p id="ultimo-respaldo" class="contador"></p>
+                <p id="contador-respaldos" class="contador"></p>
+                <p id="mensaje-automatico" class="mensaje" role="status" aria-live="polite"></p>
+                <div class="acciones">
+                    <button type="button" id="btn-crear-respaldo" class="boton-primario">Crear copia ahora</button>
+                    <button type="button" id="btn-abrir-carpeta-respaldos" class="boton-secundario">Abrir carpeta de respaldos</button>
+                </div>
+                <p class="nota-respaldos">La carpeta contiene archivos .sql y sus metadatos .json. Para conservar
+                    una copia fuera del equipo, copia ambos archivos a una memoria USB o unidad externa segura.
+                    Las copias no están cifradas: protégelas del acceso no autorizado.</p>
+                <p class="ruta-respaldos">Ubicación: <code id="ruta-respaldos"></code></p>
+                <p id="estado-respaldos" class="mensaje" role="status" aria-live="polite"></p>
+                <div class="tabla-contenedor">
+                    <table class="tabla-productos tabla-respaldos">
+                        <thead><tr><th>Fecha y hora</th><th>Tipo</th><th>Tamaño</th><th>Archivo</th><th>Acciones</th></tr></thead>
+                        <tbody id="cuerpo-lista-respaldos"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel" data-subvista="restaurar" hidden>
+                <h2>Restaurar copia de seguridad</h2>
+                <div class="aviso-restauracion">
+                    <strong>Atención: esta operación reemplaza los datos actuales.</strong>
+                    <p>Se perderán los cambios realizados después de la fecha del respaldo elegido.
+                       Antes de importar, el programa crea una copia de recuperación del estado actual.
+                       La restauración de tablas SQL no es atómica; si falla, se intentará recuperar
+                       el estado anterior y se requerirá revisar la base de datos.</p>
+                </div>
+                <form id="form-restaurar-respaldo">
+                    <div class="formulario-grid">
+                        <div class="campo">
+                            <label for="respaldo-a-restaurar">Copia disponible *</label>
+                            <select id="respaldo-a-restaurar" required><option value="">Selecciona una copia</option></select>
+                            <small>Se verificará su integridad SHA-256 antes de importarla.</small>
+                        </div>
+                        <div class="campo">
+                            <label for="confirmacion-restaurar">Escribe RESTAURAR *</label>
+                            <input id="confirmacion-restaurar" type="text" autocomplete="off" spellcheck="false"
+                                placeholder="RESTAURAR" required>
+                            <small>Después aparecerá una confirmación adicional del sistema.</small>
+                        </div>
+                    </div>
+                    <div class="acciones">
+                        <button id="btn-confirmar-restauracion" type="submit" class="boton-primario boton-peligro-respaldos">
+                            Restaurar datos de esta copia
+                        </button>
+                    </div>
+                    <p id="estado-restaurar" class="mensaje" role="status" aria-live="polite"></p>
+                </form>
+                <div id="aviso-reinicio-respaldos" class="aviso-informativo-alertas" hidden>
+                    La conexión MySQL anterior ya no se reutilizará. Cierra Electron y vuelve a abrirlo.
+                </div>
+                <button type="button" id="btn-cerrar-tras-restauracion" class="boton-secundario" hidden>
+                    Cerrar aplicación para reiniciar
+                </button>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

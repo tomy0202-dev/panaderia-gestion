@@ -1,0 +1,25 @@
+{
+  "name": "panaderia-escritorio",
+  "version": "1.0.0",
+  "description": "Sistema de gestion de panaderia",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^45.2.2",
+    "electron-builder": "^26.18.0"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.7.5",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "17.4.2",
+    "mysql2": "^3.24.6"
+  }
+}

@@ -1,0 +1,286 @@
+
+/* #&#&# MENÚS DESPLEGABLES */
+
+.menu-con-submenu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.flecha-submenu {
+    display: inline-block;
+    margin-left: auto;
+    font-size: 20px;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.submenu-abierto .flecha-submenu {
+    transform: rotate(180deg);
+}
+
+.submenu-opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 3px 0 9px 19px;
+    padding: 4px 0 4px 12px;
+    border-left: 1px solid #4c607b;
+}
+
+.submenu-opciones[hidden] {
+    display: none !important;
+}
+
+.submenu-boton {
+    display: block;
+    width: 100%;
+    padding: 11px 13px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: #b6c2d2;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: left;
+    cursor: pointer;
+}
+
+.submenu-boton:hover {
+    background: #33465f;
+    color: white;
+}
+
+.submenu-boton.submenu-seleccionado {
+    background: #eaf1f9;
+    color: #253246;
+    font-weight: 700;
+}
+
+.submenu-boton:focus-visible {
+    outline: 2px solid #e6a04b;
+    outline-offset: 2px;
+}
+
+/* #&#&# PANTALLAS INDEPENDIENTES */
+
+#vista-productos > .panel[data-subvista],
+#vista-inventario > .panel[data-subvista] {
+    margin-top: 0;
+}
+
+.panel[data-subvista][hidden] {
+    display: none !important;
+}
+
+/* #&#&# BUSCADORES Y FILTROS */
+
+.barra-filtros {
+    display: grid;
+    grid-template-columns: repeat(
+        2,
+        minmax(180px, 1fr)
+    );
+    gap: 16px;
+    align-items: end;
+    margin: 16px 0 20px;
+    padding: 19px;
+    border: 1px solid #e5e9ef;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+/* Productos solo necesita un buscador */
+
+#vista-productos .barra-filtros {
+    grid-template-columns:
+        minmax(200px, 1fr) auto;
+}
+
+/* Cada control mantiene su etiqueta */
+
+.campo-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.campo-filtro label {
+    color: #253246;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Campos de búsqueda y ordenación */
+
+.campo-filtro input,
+.campo-filtro select {
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #253246;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.campo-filtro input::placeholder {
+    color: #94a3b8;
+}
+
+.campo-filtro input:focus,
+.campo-filtro select:focus {
+    border-color: #478dbb;
+    outline: 2px solid #bdddf4;
+}
+
+/* Cantidad de resultados encontrados */
+
+.contador-filtros {
+    margin: 0;
+    align-self: end;
+    padding-bottom: 12px;
+    color: #52647b;
+    font-size: 12px;
+}
+
+/* El contador de lotes ocupa otra fila */
+
+#vista-inventario .contador-filtros {
+    grid-column: 1 / -1;
+    padding: 0;
+}
+
+/* Resaltar filas al pasar el mouse */
+
+#vista-productos .tabla-productos tbody tr:hover,
+#vista-inventario .tabla-productos tbody tr:hover {
+    background: #edf4fb;
+}
+
+/* Mantener ocultos los resultados filtrados */
+
+.tabla-productos tr[hidden] {
+    display: none !important;
+}
+
+/* #&#&# ADAPTACIÓN A VENTANAS PEQUEÑAS */
+
+@media (max-width: 800px) {
+
+    .barra-filtros,
+    #vista-productos .barra-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .contador-filtros,
+    #vista-inventario .contador-filtros {
+        grid-column: auto;
+        padding: 0;
+    }
+}
+
+@media (max-width: 650px) {
+
+    .navegacion {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .menu-con-submenu {
+        justify-content: space-between;
+    }
+
+    .submenu-opciones {
+        margin-left: 12px;
+        padding-left: 10px;
+    }
+
+    .submenu-boton {
+        padding: 11px 12px;
+        font-size: 12px;
+    }
+
+    .flecha-submenu {
+        display: inline-block;
+    }
+
+    .barra-filtros {
+        padding: 14px;
+    }
+
+    /* #&#&# BOTÓN DISCRETO PARA EDITAR PRODUCTOS */
+
+    .boton-editar-fila {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 6px 11px;
+
+        border: 1px solid #d6dee8;
+        border-radius: 6px;
+
+        background: #f8fafc;
+        color: #52647b;
+
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+
+        cursor: pointer;
+    }
+
+    .boton-editar-fila:hover {
+        background: #eaf1f9;
+        color: #253246;
+        border-color: #b9c8da;
+    }
+
+    .boton-editar-fila:focus-visible {
+        outline: 2px solid #478dbb;
+        outline-offset: 2px;
+    }
+
+    /* #&#&# CONTROL DE DISPONIBILIDAD PARA VENTA */
+
+    .control-venta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        min-height: 43px;
+        padding: 10px 13px;
+
+        border: 1px solid #d6dee8;
+        border-radius: 8px;
+
+        background: #f8fafc;
+        color: #253246;
+
+        cursor: pointer;
+    }
+
+    .control-venta input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        min-height: auto;
+        margin: 0;
+        padding: 0;
+
+        accent-color: #253246;
+        cursor: pointer;
+    }
+
+    .control-venta span {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+}
